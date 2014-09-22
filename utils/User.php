@@ -19,6 +19,12 @@ class User
         $this->password = $password;
     }
 
+    function __toString()
+    {
+        return "User [name={$this->name}, password=[{$this->password}]";
+    }
+
+
     /**
      * @return mixed
      */

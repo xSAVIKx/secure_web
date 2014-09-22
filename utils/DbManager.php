@@ -1,4 +1,5 @@
 <?php
+include_once('User.php');
 
 class DbOption
 {
@@ -85,15 +86,52 @@ class DbManager
             $this->db_option->getPort());
     }
 
-    private $SELECT_USERS_FROM_DB = "SELECT * FROM users";
+    private $SELECT_USERS_FROM_DB = "SELECT * FROM user";
+
 
     function get_all_users()
     {
         $result_set = $this->connection->query($this->SELECT_USERS_FROM_DB);
-        $user_list = new ArrayObject(array(), ArrayObject::STD_PROP_LIST);
-        while ($user = $result_set->fetch_object("User")) {
-            $user_list->append($user);
+        $user_list = null;
+        if ($result_set) {
+            $user_list = new ArrayObject(array(), ArrayObject::STD_PROP_LIST);
+            while ($data = $result_set->fetch_assoc()) {
+                $user = new User($data["id"], $data["name"], $data["password"]);
+                $user_list->append($user);
+            }
         }
         return $user_list;
+    }
+
+    private $SELECT_USER_BY_NAME_AND_PASSWORD = "SELECT id, name, password FROM user WHERE name=? AND password=?";
+
+    function check_user($name, $password)
+    {
+        if ($name == null || $password == null) {
+            throw new InvalidArgumentException;
+        }
+        $pstmt = $this->connection->prepare($this->SELECT_USER_BY_NAME_AND_PASSWORD);
+        $pstmt->bind_param("ss", $this->connection->escape_string($name), $this->connection->escape_string($password));
+        $user = null;
+        if ($pstmt->execute()) {
+            $result_set = $pstmt->get_result();
+            if ($result_set) {
+                $data = $result_set->fetch_assoc();
+                $user = new User($data["id"], $data["name"], $data["password"]);
+            }
+        }
+        return $user;
+    }
+
+    private $ADD_USER_TO_DB = "INSERT INTO user (name, password) VALUES(?, ?)";
+
+    function add_user($name, $password)
+    {
+        if ($name == null || $password == null) {
+            throw new InvalidArgumentException;
+        }
+        $pstmt = $this->connection->prepare($this->ADD_USER_TO_DB);
+        $pstmt->bind_param("ss", $this->connection->escape_string($name), $this->connection->escape_string($password));
+        return $pstmt->execute();
     }
 }
