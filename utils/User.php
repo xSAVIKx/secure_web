@@ -21,7 +21,7 @@ class User
 
     function __toString()
     {
-        return "User [name={$this->name}, password=[{$this->password}]";
+        return "User[name=$this->name, password=$this->password]";
     }
 
 

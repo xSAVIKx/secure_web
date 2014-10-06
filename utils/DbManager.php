@@ -1,5 +1,6 @@
 <?php
-include_once('User.php');
+include_once("Site.php");
+include_once("User.php");
 
 class DbOption
 {
@@ -11,7 +12,7 @@ class DbOption
     private $port;
     private $db_name;
 
-    function __construct($mysql_conf_file = "mysql.ini")
+    function __construct($mysql_conf_file = "/home/iurii/PhpstormProjects/secure_web/mysql.ini")
     {
         $this->mysql_conf_file = $mysql_conf_file;
         $mysql_options = parse_ini_file($this->mysql_conf_file);
@@ -103,7 +104,7 @@ class DbManager
         return $user_list;
     }
 
-    private $SELECT_USER_BY_NAME_AND_PASSWORD = "SELECT id, name, password FROM user WHERE name=? AND password=?";
+    private $SELECT_USER_BY_NAME_AND_PASSWORD = "SELECT id, name, password FROM user WHERE name=? AND password=? LIMIT 1";
 
     function check_user($name, $password)
     {
@@ -112,6 +113,28 @@ class DbManager
         }
         $pstmt = $this->connection->prepare($this->SELECT_USER_BY_NAME_AND_PASSWORD);
         $pstmt->bind_param("ss", $this->connection->escape_string($name), $this->connection->escape_string($password));
+        $user = null;
+        if ($pstmt->execute()) {
+            $result_set = $pstmt->get_result();
+            if ($result_set) {
+                $data = $result_set->fetch_assoc();
+                if ($data) {
+                    $user = new User($data["id"], $data["name"], $data["password"]);
+                }
+            }
+        }
+        return $user;
+    }
+
+    private $SELECT_USER_BY_ID = "SELECT id, name, password FROM user WHERE id=?";
+
+    function get_user_by_id($id)
+    {
+        if ($id == null) {
+            throw new InvalidArgumentException;
+        }
+        $pstmt = $this->connection->prepare($this->SELECT_USER_BY_ID);
+        $pstmt->bind_param("s", $this->connection->escape_string($id));
         $user = null;
         if ($pstmt->execute()) {
             $result_set = $pstmt->get_result();
@@ -133,5 +156,22 @@ class DbManager
         $pstmt = $this->connection->prepare($this->ADD_USER_TO_DB);
         $pstmt->bind_param("ss", $this->connection->escape_string($name), $this->connection->escape_string($password));
         return $pstmt->execute();
+    }
+
+    private $SELECT_SITES_FROM_DB = "SELECT * FROM site";
+
+    function get_all_websites()
+    {
+        $result_set = $this->connection->query($this->SELECT_SITES_FROM_DB);
+        $web_site_list = null;
+
+        if ($result_set) {
+            $web_site_list = new ArrayObject(array(), ArrayObject::STD_PROP_LIST);
+            while ($data = $result_set->fetch_assoc()) {
+                $web_site = new Site($data["id"], $data["title"], $data["url"]);
+                $web_site_list->append($web_site);
+            }
+        }
+        return $web_site_list;
     }
 }

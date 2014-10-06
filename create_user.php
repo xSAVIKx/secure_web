@@ -5,8 +5,7 @@
  * Date: 22.09.14
  * Time: 15:32
  */
-include_once('utils/User.php');
-include_once('utils/DbManager.php');
+include_once('utils/include_dependencies.php');
 $name = $_GET['name'];
 $password = $_GET['password'];
 $dbManager = new DbManager();

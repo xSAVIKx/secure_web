@@ -5,21 +5,24 @@
  * Date: 19.09.14
  * Time: 13:18
  */
-include_once('utils/User.php');
-include_once('utils/DbManager.php');
+include_once('utils/include_dependencies.php');
+include_once('utils/include_smarty.php');
 
-$name = $_GET['name'];
-$password = $_GET['password'];
-$dbManager = new DbManager();
-$user = $dbManager->check_user($name, $password);
-if ($user) {
-    print "You have succesfully logged in as {$name}<br/>";
-    print "Users in system:<br/>";
-    $user_list = $dbManager->get_all_users();
-    foreach ($user_list as $user) {
-        print $user . "<br/>";
+if (isset($_GET['name'], $_GET['password']) || isset($_POST['name'], $_POST['password'])) {
+    $name = $_GET['name'];
+    $password = $_GET['password'];
+    if (login($name, $password)) {
+        sec_session_start();
+        $dbManager = new DbManager();
+        $user_list = $dbManager->get_all_users();
+        $smarty->assign('title', 'users');
+        $smarty->assign('user_list', $user_list);
+        $smarty->display('users.tpl');
+    } else {
+        $message[] = (new Message("Invalid login or password", Message::WARNING));
+        add_message($message);
+        $smarty->assign('title', 'index');
+        $smarty->assign('message', $message);
+        $smarty->display('index.tpl');
     }
-} else {
-    print "No user with given credentials was found";
 }
-
