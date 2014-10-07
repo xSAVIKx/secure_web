@@ -6,13 +6,35 @@
  * Time: 15:32
  */
 include_once('utils/include_dependencies.php');
-$name = $_GET['name'];
-$password = $_GET['password'];
-$dbManager = new DbManager();
-$user = $dbManager->check_user($name, $password);
-if ($user) {
-    print "User with such name={$name} already exists\n";
-} else {
-    $dbManager->add_user($name, $password);
-    print "User '$name' successfullt created";
+include_once('utils/include_smarty.php');
+$process_form = false;
+$name = null;
+$password = null;
+if (isset($_GET['name'], $_GET['password'])) {
+    $name = $_GET['name'];
+    $password = $_GET['password'];
+    $process_form = true;
+} elseif (isset($_POST['name'], $_POST['password'])) {
+    $name = $_POST['name'];
+    $password = $_POST['password'];
+    $process_form = true;
+}
+if ($process_form == true) {
+    $dbManager = new DbManager();
+    $user = $dbManager->check_user($name, $password);
+    if ($user) {
+        $message[] = new Message("User with such name already exists", Message::INFO);
+        $smarty->assign('message', $message);
+        $smarty->display('index.tpl');
+    } else {
+        $dbManager->add_user($name, $password);
+        login($name, $password);
+        $dbManager = new DbManager();
+        $user_list = $dbManager->get_all_users();
+        $smarty->assign('title', 'users');
+        $smarty->assign('user_list', $user_list);
+        $message[] = new Message("You have successfully signed up!", Message::SUCCESS);
+        $smarty->assign('message', $message);
+        $smarty->display('users.tpl');
+    }
 }

@@ -41,10 +41,4 @@ class Message implements JsonSerializable
     }
 }
 
-function add_message($message)
-{
-    $json = json_encode($message, true);
-    setcookie('message', $json, time() + 15);
-}
-
-$message = [];
+$message = array();

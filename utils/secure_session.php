@@ -6,7 +6,7 @@
  * Time: 13:00
  */
 include_once("DbManager.php");
-define("SECURE", true);
+define("SECURE", false);
 
 function sec_session_start()
 {
@@ -51,6 +51,7 @@ function login($name, $password)
     try {
         $user = $dbManager->check_user($name, $password);
         if ($user != null) {
+            sec_session_start();
             // Password is correct!
             // Get the user-agent string of the user.
             $user_browser = $_SERVER['HTTP_USER_AGENT'];

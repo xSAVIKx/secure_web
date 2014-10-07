@@ -9,7 +9,6 @@
                     <li><p class="navbar-text">Hello, {$smarty.session.username}</p></li>
                     <li><p class="navbar-text"><a href="/logout.php">logout</a></p></li>
                 {/if}
-
             </ul>
         </div>
     </div>
