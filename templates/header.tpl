@@ -3,7 +3,7 @@
         <div class="navbar-header">
             <a href="/index.php" class="navbar-brand">Secure web</a>
         </div>
-        <div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse">
+        <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav navbar-right">
                 {if isset($smarty.session.username)}
                     <li><p class="navbar-text">Hello, {$smarty.session.username}</p></li>
