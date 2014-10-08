@@ -6,7 +6,6 @@
  * Time: 13:18
  */
 include_once('utils/include_dependencies.php');
-include_once('utils/include_smarty.php');
 $process_form = false;
 $name = null;
 $password = null;
@@ -19,17 +18,38 @@ if (isset($_GET['name'], $_GET['password'])) {
     $password = $_POST['password'];
     $process_form = true;
 }
+
 if ($process_form == true) {
     if (login($name, $password)) {
         $dbManager = new DbManager();
         $user_list = $dbManager->get_all_users();
-        $smarty->assign('title', 'users');
-        $smarty->assign('user_list', $user_list);
-        $smarty->display('users.tpl');
+        print "<a href='/logout.php'>logout</a><br/>";
+
+        print "
+        <h5>Users in system:</h5>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Password</th>
+        </tr>
+        </thead>
+        <tbody>";
+        foreach ($user_list as $user) {
+            print "<tr>
+                <td>
+            {$user->getId()}</td>
+                <td>
+            {$user->getName()}</td>
+                <td>
+            {$user->getPassword()}</td>
+            </tr>";
+        }
+        print "
+        </tbody>
+    </table>";
     } else {
-        $message[] = new Message("Invalid login or password", Message::WARNING);
-        $smarty->assign('title', 'index');
-        $smarty->assign('message', $message);
-        $smarty->display('index.tpl');
+        print "Wrong username or password";
     }
 }

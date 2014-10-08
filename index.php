@@ -6,14 +6,19 @@
  * Time: 11:51
  */
 include_once("utils/include_dependencies.php");
-include_once("utils/include_smarty.php");
 if (is_logged_in()) {
-    $dbManager = new DbManager();
-    $user_list = $dbManager->get_all_users();
-    $smarty->assign('title', 'users');
-    $smarty->assign('user_list', $user_list);
-    $smarty->display('users.tpl');
-} else {
-    $smarty->assign('title', 'Index page');
-    $smarty->display('index.tpl');
+    print "<a href='/logout.php'>logout</a><br/>";
 }
+print "<form action=''
+      method='get'>
+            <label for='name'>Username</label>
+            <input required='required' type='text' maxlength=20 name='name'
+                   id='name' placeholder='username'/>
+                   <br/>
+            <label for='password'>Password</label>
+            <input required='required' type='password' maxlength='16'
+                   name='password' id='password' placeholder='password'/>
+                   <br/>
+            <input type='submit'  value='submit' formaction='login.php'/>
+            <a  href='/lucky.php'>I'm lucky</a>
+</form>";

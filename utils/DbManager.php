@@ -146,18 +146,6 @@ class DbManager
         return $user;
     }
 
-    private $ADD_USER_TO_DB = "INSERT INTO user (name, password) VALUES(?, ?)";
-
-    function add_user($name, $password)
-    {
-        if ($name == null || $password == null) {
-            throw new InvalidArgumentException;
-        }
-        $pstmt = $this->connection->prepare($this->ADD_USER_TO_DB);
-        $pstmt->bind_param("ss", $this->connection->escape_string($name), $this->connection->escape_string($password));
-        return $pstmt->execute();
-    }
-
     private $SELECT_SITES_FROM_DB = "SELECT * FROM site";
 
     function get_all_websites()

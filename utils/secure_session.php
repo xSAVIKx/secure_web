@@ -6,11 +6,11 @@
  * Time: 13:00
  */
 include_once("DbManager.php");
-define("SECURE", false);
+define("SECURE", true);
 
 function sec_session_start()
 {
-    $session_name = "Session: " . uniqid();
+    $session_name = "Session" . uniqid();
     $httponly = true;
     $secure = SECURE;
     if (ini_set('session.use_only_cookies', 1) === FALSE) {
@@ -26,7 +26,7 @@ function sec_session_start()
     // Sets the session name to the one set above.
     session_name($session_name);
     session_start();            // Start the PHP session
-    session_regenerate_id();    // regenerated the session, delete the old one.
+    session_regenerate_id(true);    // regenerated the session, delete the old one.
 }
 
 function logout()
@@ -49,9 +49,9 @@ function login($name, $password)
 {
     $dbManager = new DbManager();
     try {
+        $password = hash('sha512', $password);
         $user = $dbManager->check_user($name, $password);
         if ($user != null) {
-            sec_session_start();
             // Password is correct!
             // Get the user-agent string of the user.
             $user_browser = $_SERVER['HTTP_USER_AGENT'];
