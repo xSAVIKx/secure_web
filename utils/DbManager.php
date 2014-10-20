@@ -174,4 +174,28 @@ class DbManager
         }
         return $web_site_list;
     }
+
+    private $UPDATE_USER_INFO_BY_ID = "UPDATE user SET name=?, password=? WHERE id=?";
+
+    function update_user_info($id, $new_name, $new_password)
+    {
+        if ($id == null || $new_name == null || $new_password == null) {
+            throw new InvalidArgumentException;
+        }
+        $pstmt = $this->connection->prepare($this->$UPDATE_USER_INFO_BY_ID);
+        $pstmt->bind_param("sss", $this->connection->escape_string($new_name), $this->connection->escape_string($new_password), $this->connection->escape_string($id));
+        return $pstmt->execute();
+    }
+
+    private $DELETE_USER_BY_ID = "DELETE FROM user WHERE id=?";
+
+    function delete_user($id)
+    {
+        if ($id == null) {
+            throw new InvalidArgumentException;
+        }
+        $pstmt = $this->connection->prepare($this->$DELETE_USER_BY_ID);
+        $pstmt->bind_param("s", $this->connection->escape_string($id));
+        return $pstmt->execute();
+    }
 }

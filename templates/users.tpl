@@ -7,6 +7,8 @@
             <th>ID</th>
             <th>Name</th>
             <th>Password</th>
+            <th></th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -15,10 +17,13 @@
                 <td>{$user->getId()}</td>
                 <td>{$user->getName()}</td>
                 <td>{$user->getPassword()}</td>
+                {*TODO make valid links*}
+                <td><a href="#">change</a></td>
+                <td><a href="#">delete</a></td>
             </tr>
             {foreachelse}
             <tr>
-                <td colspan="3">No items found</td>
+                <td colspan="5">No items found</td>
             </tr>
         {/foreach}
         </tbody>
