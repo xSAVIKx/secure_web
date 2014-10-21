@@ -16,7 +16,7 @@ class DbOption
     private $port;
     private $db_name;
 
-    function __construct($mysql_conf_file = "/home/iurii/PhpstormProjects/secure_web/mysql.ini")
+    function __construct($mysql_conf_file = "/home/iurii/PhpstormProjects/secure_web/db/mysql.ini")
     {
         $this->mysql_conf_file = $mysql_conf_file;
         $mysql_options = parse_ini_file($this->mysql_conf_file);
