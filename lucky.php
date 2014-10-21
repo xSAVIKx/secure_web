@@ -6,13 +6,6 @@
  * Time: 9:38
  */
 include_once('utils/include_dependencies.php');
-
-function redirect($url, $statusCode = 303)
-{
-    header('Location: ' . $url, true, $statusCode);
-    die();
-}
-
 $dbManager = new DbManager();
 $web_sites = $dbManager->get_all_websites();
 

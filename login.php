@@ -11,12 +11,12 @@ $process_form = false;
 $name = null;
 $password = null;
 if (isset($_GET['name'], $_GET['password'])) {
-    $name = $_GET['name'];
-    $password = $_GET['password'];
+    $name = filter_input(INPUT_GET, 'name', FILTER_SANITIZE_STRING);
+    $password = filter_input(INPUT_GET, 'password', FILTER_SANITIZE_STRING);
     $process_form = true;
 } elseif (isset($_POST['name'], $_POST['password'])) {
-    $name = $_POST['name'];
-    $password = $_POST['password'];
+    $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);;
     $process_form = true;
 }
 if ($process_form == true) {
@@ -32,4 +32,9 @@ if ($process_form == true) {
         $smarty->assign('message', $message);
         $smarty->display('index.tpl');
     }
+} else {
+    $message[] = new Message("Something goes wrong", Message::WARNING);
+    $smarty->assign('title', 'index');
+    $smarty->assign('message', $message);
+    $smarty->display('index.tpl');
 }

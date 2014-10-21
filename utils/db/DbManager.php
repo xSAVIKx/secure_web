@@ -1,70 +1,8 @@
 <?php
-include_once("Site.php");
-include_once("User.php");
+include_once("entity/Site.php");
+include_once("entity/User.php");
+include_once("DbOption.php");
 
-class DbOption
-{
-
-    private $mysql_conf_file;
-    private $host;
-    private $user;
-    private $pswd;
-    private $port;
-    private $db_name;
-
-    function __construct($mysql_conf_file = "/home/iurii/PhpstormProjects/secure_web/mysql.ini")
-    {
-        $this->mysql_conf_file = $mysql_conf_file;
-        $mysql_options = parse_ini_file($this->mysql_conf_file);
-        $this->host = $mysql_options['host'];
-        $this->user = $mysql_options['user'];
-        $this->pswd = $mysql_options['password'];
-        $this->port = $mysql_options['port'];
-        $this->db_name = $mysql_options['db'];
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDbName()
-    {
-        return $this->db_name;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getHost()
-    {
-        return $this->host;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPort()
-    {
-        return $this->port;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPswd()
-    {
-        return $this->pswd;
-    }
-
-
-}
 
 /**
  * Created by PhpStorm.
@@ -74,10 +12,10 @@ class DbOption
  */
 class DbManager
 {
-    private $connection;
-    private $db_option;
+    protected $connection;
+    protected $db_option;
 
-    function __construct()
+    public function __construct()
     {
         $this->db_option = new DbOption();
         $this->connection = new mysqli($this->db_option->getHost(),
@@ -90,7 +28,7 @@ class DbManager
     private $SELECT_USERS_FROM_DB = "SELECT * FROM user";
 
 
-    function get_all_users()
+    public function get_all_users()
     {
         $result_set = $this->connection->query($this->SELECT_USERS_FROM_DB);
         $user_list = null;
@@ -104,15 +42,38 @@ class DbManager
         return $user_list;
     }
 
+    private $SELECT_USER_BY_NAME = "SELECT id FROM user WHERE name=? LIMIT 1";
+
+    public function is_user_in_database($name)
+    {
+        if ($name == null) {
+            throw new InvalidArgumentException;
+        }
+        $pstmt = $this->connection->prepare($this->SELECT_USER_BY_NAME);
+        $pstmt->bind_param("s", $this->connection->escape_string($name));
+        $user = null;
+        if ($pstmt->execute()) {
+            $result_set = $pstmt->get_result();
+            if ($result_set) {
+                $data = $result_set->fetch_assoc();
+                if ($data) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private $SELECT_USER_BY_NAME_AND_PASSWORD = "SELECT id, name, password FROM user WHERE name=? AND password=? LIMIT 1";
 
-    function check_user($name, $password)
+    public function get_user_if_password_is_correct($name, $password)
     {
         if ($name == null || $password == null) {
             throw new InvalidArgumentException;
         }
+        $password_hash = $this->get_password_hash($password);
         $pstmt = $this->connection->prepare($this->SELECT_USER_BY_NAME_AND_PASSWORD);
-        $pstmt->bind_param("ss", $this->connection->escape_string($name), $this->connection->escape_string($password));
+        $pstmt->bind_param("ss", $this->connection->escape_string($name), $this->connection->escape_string($password_hash));
         $user = null;
         if ($pstmt->execute()) {
             $result_set = $pstmt->get_result();
@@ -126,9 +87,24 @@ class DbManager
         return $user;
     }
 
+    protected function get_password_hash($password)
+    {
+        return hash('sha512', $password);
+    }
+
+    public function get_user_by_id_if_password_is_correct($id, $password)
+    {
+        $user = $this->get_user_by_id($id);
+        $password_hash = $this->get_password_hash($password);
+        if ($user->getPassword() === $password_hash) {
+            return $user;
+        }
+        return null;
+    }
+
     private $SELECT_USER_BY_ID = "SELECT id, name, password FROM user WHERE id=?";
 
-    function get_user_by_id($id)
+    public function get_user_by_id($id)
     {
         if ($id == null) {
             throw new InvalidArgumentException;
@@ -148,19 +124,20 @@ class DbManager
 
     private $ADD_USER_TO_DB = "INSERT INTO user (name, password) VALUES(?, ?)";
 
-    function add_user($name, $password)
+    public function add_user($name, $password)
     {
         if ($name == null || $password == null) {
             throw new InvalidArgumentException;
         }
+        $password_hash = $this->get_password_hash($password);
         $pstmt = $this->connection->prepare($this->ADD_USER_TO_DB);
-        $pstmt->bind_param("ss", $this->connection->escape_string($name), $this->connection->escape_string($password));
+        $pstmt->bind_param("ss", $this->connection->escape_string($name), $this->connection->escape_string($password_hash));
         return $pstmt->execute();
     }
 
     private $SELECT_SITES_FROM_DB = "SELECT * FROM site";
 
-    function get_all_websites()
+    public function get_all_websites()
     {
         $result_set = $this->connection->query($this->SELECT_SITES_FROM_DB);
         $web_site_list = null;
@@ -177,25 +154,33 @@ class DbManager
 
     private $UPDATE_USER_INFO_BY_ID = "UPDATE user SET name=?, password=? WHERE id=?";
 
-    function update_user_info($id, $new_name, $new_password)
+    public function update_user_info($id, $new_name, $new_password)
     {
         if ($id == null || $new_name == null || $new_password == null) {
             throw new InvalidArgumentException;
         }
-        $pstmt = $this->connection->prepare($this->$UPDATE_USER_INFO_BY_ID);
-        $pstmt->bind_param("sss", $this->connection->escape_string($new_name), $this->connection->escape_string($new_password), $this->connection->escape_string($id));
+        $password_hash = $this->get_password_hash($new_password);
+        $pstmt = $this->connection->prepare($this->UPDATE_USER_INFO_BY_ID);
+        $pstmt->bind_param("sss", $this->connection->escape_string($new_name), $this->connection->escape_string($password_hash), $this->connection->escape_string($id));
         return $pstmt->execute();
+    }
+
+    public function user_is_admin($id)
+    {
+
     }
 
     private $DELETE_USER_BY_ID = "DELETE FROM user WHERE id=?";
 
-    function delete_user($id)
+    public function delete_user($id)
     {
         if ($id == null) {
             throw new InvalidArgumentException;
         }
-        $pstmt = $this->connection->prepare($this->$DELETE_USER_BY_ID);
+        $pstmt = $this->connection->prepare($this->DELETE_USER_BY_ID);
         $pstmt->bind_param("s", $this->connection->escape_string($id));
         return $pstmt->execute();
     }
+
+
 }
