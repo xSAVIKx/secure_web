@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: iurii
- * Date: 06.10.14
- * Time: 9:38
- */
 include_once('utils/include_dependencies.php');
 $dbManager = new DbManager();
 $web_sites = $dbManager->get_all_websites();

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: iurii
- * Date: 06.10.14
- * Time: 13:00
- */
 include_once("db/DbSessionManager.php");
 
 class session implements SessionHandlerInterface

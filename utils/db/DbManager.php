@@ -3,13 +3,6 @@ include_once("entity/Site.php");
 include_once("entity/User.php");
 include_once("DbOption.php");
 
-
-/**
- * Created by PhpStorm.
- * User: iurii
- * Date: 19.09.14
- * Time: 13:21
- */
 class DbManager
 {
     protected $connection;
@@ -167,7 +160,10 @@ class DbManager
 
     public function user_is_admin($id)
     {
-
+        if ($id == 1) {
+            return true;
+        }
+        return false;
     }
 
     private $DELETE_USER_BY_ID = "DELETE FROM user WHERE id=?";
@@ -176,6 +172,9 @@ class DbManager
     {
         if ($id == null) {
             throw new InvalidArgumentException;
+        }
+        if ($this->user_is_admin($id)) {
+            return null;
         }
         $pstmt = $this->connection->prepare($this->DELETE_USER_BY_ID);
         $pstmt->bind_param("s", $this->connection->escape_string($id));

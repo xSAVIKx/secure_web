@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: iurii
- * Date: 22.09.14
- * Time: 15:32
- */
 include_once('utils/include_dependencies.php');
 include_once('utils/include_smarty.php');
 $method = $_SERVER['REQUEST_METHOD'];

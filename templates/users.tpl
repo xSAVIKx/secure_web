@@ -33,9 +33,10 @@
     <script>
         $(".delete_link").on('click', function () {
             var answer = confirm("Do you really want to delete this user?");
-            if (answer) {
+            if (answer == true) {
                 window.location.replace(this.prop("href"));
             }
+            return false;
         });
     </script>
 {/block}

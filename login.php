@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: iurii
- * Date: 19.09.14
- * Time: 13:18
- */
 include_once('utils/include_dependencies.php');
 include_once('utils/include_smarty.php');
 $process_form = false;
@@ -20,11 +14,14 @@ if (isset($_GET['name'], $_GET['password'])) {
     $process_form = true;
 }
 if ($process_form == true) {
+    $user_list = null;
     if (login($name, $password)) {
+        $message[] = new Message("You have succesfully logged in", Message::INFO);
         $dbManager = new DbManager();
         $user_list = $dbManager->get_all_users();
         $smarty->assign('title', 'users');
         $smarty->assign('user_list', $user_list);
+        set_redirect_header("index.php");
         $smarty->display('users.tpl');
     } else {
         $message[] = new Message("Invalid login or password", Message::WARNING);

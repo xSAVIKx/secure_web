@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: iurii
- * Date: 06.10.14
- * Time: 11:51
- */
 include_once("utils/include_dependencies.php");
 include_once("utils/include_smarty.php");
 if (is_logged_in()) {

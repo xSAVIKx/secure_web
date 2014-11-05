@@ -1,11 +1,4 @@
 <?php
-
-/**
- * Created by PhpStorm.
- * User: iurii
- * Date: 21.10.14
- * Time: 18:01
- */
 class DbSessionManager extends DbManager
 {
     private $SELECT_SESSION_DATA_BY_ID = "SELECT data FROM sessions WHERE id=? LIMIT 1";

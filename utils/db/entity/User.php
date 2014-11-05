@@ -1,11 +1,4 @@
 <?php
-
-/**
- * Created by PhpStorm.
- * User: iurii
- * Date: 19.09.14
- * Time: 13:52
- */
 class User
 {
     private $id;
