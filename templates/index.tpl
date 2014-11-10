@@ -27,3 +27,24 @@
         </div>
     </form>
 {/block}
+{block name="scripts"}
+    <script>
+        $(document).ready(function () {
+            $("form").submit(function (event) {
+                var username = $("#name");
+                var password = $("#password");
+                if (!username || username.val().trim().length == 0) {
+                    alert("Username should not be empty and cannot consist of only whitespace.");
+                    event.preventDefault();
+                    return false;
+                }
+                if (!password) {
+                    alert("Password should not be empty")
+                    event.preventDefault();
+                    return false;
+                }
+                event.process();
+            });
+        });
+    </script>
+{/block}

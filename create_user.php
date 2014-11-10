@@ -6,13 +6,11 @@ if ($method == 'POST') {
     $process_form = false;
     $name = null;
     $password = null;
-    if (isset($_GET['name'], $_GET['password'])) {
-        $name = $_GET['name'];
-        $password = $_GET['password'];
-        $process_form = true;
-    } elseif (isset($_POST['name'], $_POST['password'])) {
+    $email = null;
+    if (isset($_POST['name'], $_POST['password'])) {
         $name = $_POST['name'];
         $password = $_POST['password'];
+        $email = $_POST['email'];
         $process_form = true;
     }
     if ($process_form == true) {
@@ -22,7 +20,7 @@ if ($method == 'POST') {
             $smarty->assign('message', $message);
             $smarty->display('create_user.tpl');
         } else {
-            $dbManager->add_user($name, $password);
+            $dbManager->add_user($name, $password, $email);
             $message[] = new Message("You have successfully created new user", Message::SUCCESS);
             $smarty->assign('message', $message);
             $smarty->assign('title', 'Index page');
@@ -30,7 +28,7 @@ if ($method == 'POST') {
             $smarty->display('index.tpl');
         }
     }
-}else{
+} else {
     $smarty->assign('title', 'Create user');
     $smarty->display('create_user.tpl');
 }

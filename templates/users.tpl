@@ -7,6 +7,7 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Email</th>
             <th>Password</th>
             <th></th>
             <th></th>
@@ -15,15 +16,16 @@
         <tbody>
         {foreach from=$user_list item=user}
             <tr>
-                <td>{$user->getId()}</td>
-                <td>{$user->getName()}</td>
-                <td>{$user->getPassword()}</td>
+                <td>{$user->getId()|escape}</td>
+                <td>{$user->getName()|escape}</td>
+                <td>{$user->getEmail()|escape}</td>
+                <td>{$user->getPassword()|escape}</td>
                 <td><a href="/change_user.php?user_id={$user->getId()}">change</a></td>
                 <td><a class="delete_link" href="/delete_user.php?user_id={$user->getId()}">delete</a></td>
             </tr>
             {foreachelse}
             <tr>
-                <td colspan="5">No items found</td>
+                <td colspan="6">No items found</td>
             </tr>
         {/foreach}
         </tbody>

@@ -28,7 +28,7 @@ class DbManager
         if ($result_set) {
             $user_list = new ArrayObject(array(), ArrayObject::STD_PROP_LIST);
             while ($data = $result_set->fetch_assoc()) {
-                $user = new User($data["id"], $data["name"], $data["password"]);
+                $user = new User($data["id"], $data["name"], $data["password"], $data['email']);
                 $user_list->append($user);
             }
         }
@@ -57,7 +57,7 @@ class DbManager
         return false;
     }
 
-    private $SELECT_USER_BY_NAME_AND_PASSWORD = "SELECT id, name, password FROM user WHERE name=? AND password=? LIMIT 1";
+    private $SELECT_USER_BY_NAME_AND_PASSWORD = "SELECT * FROM user WHERE name=? AND password=? LIMIT 1";
 
     public function get_user_if_password_is_correct($name, $password)
     {
@@ -73,7 +73,7 @@ class DbManager
             if ($result_set) {
                 $data = $result_set->fetch_assoc();
                 if ($data) {
-                    $user = new User($data["id"], $data["name"], $data["password"]);
+                    $user = new User($data["id"], $data["name"], $data["password"], $data['email']);
                 }
             }
         }
@@ -95,7 +95,7 @@ class DbManager
         return null;
     }
 
-    private $SELECT_USER_BY_ID = "SELECT id, name, password FROM user WHERE id=?";
+    private $SELECT_USER_BY_ID = "SELECT * FROM user WHERE id=? LIMIT 1";
 
     public function get_user_by_id($id)
     {
@@ -109,22 +109,25 @@ class DbManager
             $result_set = $pstmt->get_result();
             if ($result_set) {
                 $data = $result_set->fetch_assoc();
-                $user = new User($data["id"], $data["name"], $data["password"]);
+                $user = new User($data["id"], $data["name"], $data["password"], $data['email']);
             }
         }
         return $user;
     }
 
-    private $ADD_USER_TO_DB = "INSERT INTO user (name, password) VALUES(?, ?)";
+    private $ADD_USER_TO_DB = "INSERT INTO user (name, password, email) VALUES(?, ?, ?)";
 
-    public function add_user($name, $password)
+    public function add_user($name, $password, $email)
     {
         if ($name == null || $password == null) {
             throw new InvalidArgumentException;
         }
         $password_hash = $this->get_password_hash($password);
         $pstmt = $this->connection->prepare($this->ADD_USER_TO_DB);
-        $pstmt->bind_param("ss", $this->connection->escape_string($name), $this->connection->escape_string($password_hash));
+        $pstmt->bind_param("sss",
+            $this->connection->escape_string($name),
+            $this->connection->escape_string($password_hash),
+            $this->connection->escape_string($email));
         return $pstmt->execute();
     }
 
@@ -145,16 +148,19 @@ class DbManager
         return $web_site_list;
     }
 
-    private $UPDATE_USER_INFO_BY_ID = "UPDATE user SET name=?, password=? WHERE id=?";
+    private $UPDATE_USER_INFO_BY_ID = "UPDATE user SET name=?, password=?, email=? WHERE id=? LIMIT 1";
 
-    public function update_user_info($id, $new_name, $new_password)
+    public function update_user_info($id, $new_name, $new_password, $email)
     {
         if ($id == null || $new_name == null || $new_password == null) {
             throw new InvalidArgumentException;
         }
         $password_hash = $this->get_password_hash($new_password);
         $pstmt = $this->connection->prepare($this->UPDATE_USER_INFO_BY_ID);
-        $pstmt->bind_param("sss", $this->connection->escape_string($new_name), $this->connection->escape_string($password_hash), $this->connection->escape_string($id));
+        $pstmt->bind_param("ssss", $this->connection->escape_string($new_name),
+            $this->connection->escape_string($password_hash),
+            $this->connection->escape_string($email),
+            $this->connection->escape_string($id));
         return $pstmt->execute();
     }
 
@@ -166,7 +172,7 @@ class DbManager
         return false;
     }
 
-    private $DELETE_USER_BY_ID = "DELETE FROM user WHERE id=?";
+    private $DELETE_USER_BY_ID = "DELETE FROM user WHERE id=? LIMIT 1";
 
     public function delete_user($id)
     {

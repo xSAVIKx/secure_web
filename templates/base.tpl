@@ -19,7 +19,7 @@
 {block name="messages"}
     {include file='messages.tpl'}
 {/block}
-<div class="container">
+<div class="container-fluid">
     {block name="body"}
 
     {/block}
