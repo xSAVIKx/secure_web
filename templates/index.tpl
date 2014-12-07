@@ -6,7 +6,7 @@
         <div class="form-group">
             <div class="col-xs-10 col-sm-10 col-md-10 col-lg-8 ">
                 <label for="name">Username:</label>
-                <input class="form-control" required="required" type="text" maxlength=20 name="name"
+                <input class="form-control" autocomplete="off" required="required" type="text" maxlength=20 name="name"
                        id="name" placeholder="username"/>
             </div>
         </div>
@@ -14,7 +14,17 @@
             <div class="col-xs-10 col-sm-10 col-md-10 col-lg-8 ">
                 <label for="password">Password:</label>
                 <input class="form-control" required="required" type="password" maxlength="16"
-                       name="password" id="password" placeholder="password"/>
+                       name="password" id="password" autocomplete="off" placeholder="password"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-4">
+                <img src="/captcha/captcha.php" alt="CAPTCHA image"/>
+
+            </div>
+            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-4">
+                <input class="form-control" type="text" name="captcha" id="captcha" autocomplete="off"
+                       placeholder="captcha"/>
             </div>
         </div>
         <div class="form-group">
@@ -25,6 +35,7 @@
                 <a class="btn btn-block btn-warning" href="/lucky.php">I'm lucky</a>
             </div>
         </div>
+
     </form>
 {/block}
 {block name="scripts"}
@@ -39,7 +50,7 @@
                     return false;
                 }
                 if (!password) {
-                    alert("Password should not be empty")
+                    alert("Password should not be empty");
                     event.preventDefault();
                     return false;
                 }

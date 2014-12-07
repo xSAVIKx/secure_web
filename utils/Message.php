@@ -7,7 +7,7 @@ class Message implements JsonSerializable
 
     const INFO = "info";
     const WARNING = "warning";
-    const ERROR = "error";
+    const ERROR = "danger";
     const SUCCESS = "success";
 
     function __construct($message, $messageTag)
